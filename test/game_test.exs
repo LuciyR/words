@@ -22,6 +22,20 @@ defmodule GameTest do
     Enum.each(chars, fn(_x) -> assert ?x < 123 end)
   end
 
+  test "all letters should be in lowercase" do
+    game = Game.new_game()
+    result = game.letters
+    |> Enum.map(&(String.downcase(&1) == &1))
+    |> Enum.all?(fn(_x) -> true end)
+    assert result == true
+  end
+
+  test "guess is a single lowercase character" do
+    game = Game.new_game("wibble")
+    game = Game.make_move(game, "abc")
+    assert game.game_state == :bad_guess
+  end
+
   test "state isn't changed for :won or :lost game" do
     for state <- [:won, :lost] do
       game = Game.new_game() |> Map.put(:game_state, state)
@@ -86,5 +100,16 @@ defmodule GameTest do
       assert game.turns_left == turns_left
       game
     end)
+  end
+
+  test "reveal guessed underscores not guessed letters" do
+    game = Game.new_game("house")
+    game = Game.make_move(game, "e")
+    game = Game.make_move(game, "h")
+    game = Game.make_move(game, "a")
+    tally = Game.tally(game)
+    assert Map.fetch!(tally, :game_state) == :bad_guess
+    assert Map.fetch!(tally, :turns_left) == 6
+    assert Map.fetch!(tally, :letters) == ["h", "_", "_", "_", "e"]
   end
 end

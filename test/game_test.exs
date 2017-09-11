@@ -32,34 +32,34 @@ defmodule GameTest do
 
   test "guess is a single lowercase character" do
     game = Game.new_game("wibble")
-    game = Game.make_move(game, "abc")
+    {game, _tally} = Game.make_move(game, "abc")
     assert game.game_state == :bad_guess
   end
 
-  test "state isn't changed for :won or :lost game" do
+  test "state isn't changed for won or lost game" do
     for state <- [:won, :lost] do
       game = Game.new_game() |> Map.put(:game_state, state)
-      assert ^game = Game.make_move(game, "a")
+      assert {^game, _} = Game.make_move(game, "x")
     end
   end
 
   test "first occurence of letter is not already used" do
     game = Game.new_game()
-    game = Game.make_move(game, "a")
+    {game, _tally} = Game.make_move(game, "a")
     refute game.game_state == :already_used
   end
 
   test "second occurence of letter is not already used" do
     game = Game.new_game()
-    game = Game.make_move(game, "a")
+    {game, _tally} = Game.make_move(game, "a")
     refute game.game_state == :already_used
-    game = Game.make_move(game, "a")
+    {game, _tally} = Game.make_move(game, "a")
     assert game.game_state == :already_used
   end
 
   test "a good guess is recognized" do
     game = Game.new_game("wibble")
-    game = Game.make_move(game, "w")
+    {game, _tally} = Game.make_move(game, "w")
     assert game.game_state == :good_guess
     assert game.turns_left == 7
   end
@@ -72,7 +72,7 @@ defmodule GameTest do
      {"l", :good_guess},
      {"e", :won}]
     |> Enum.reduce(game, fn({guess, state}, game) ->
-       game = Game.make_move(game, guess)
+       {game, _tally} = Game.make_move(game, guess)
        assert game.game_state == state
        game
     end)
@@ -80,7 +80,7 @@ defmodule GameTest do
 
   test "bad guess is recognized" do
     game = Game.new_game("wibble")
-    game = Game.make_move(game, "x")
+    {game, _tally} = Game.make_move(game, "x")
     assert game.game_state == :bad_guess
     assert game.turns_left == 6
   end
@@ -95,7 +95,7 @@ defmodule GameTest do
      {"f", :bad_guess, 1},
      {"g", :lost, 1}]
     |> Enum.reduce(game, fn({guess, state, turns_left}, game) ->
-      game = Game.make_move(game, guess)
+      {game, _tally} = Game.make_move(game, guess)
       assert game.game_state == state
       assert game.turns_left == turns_left
       game
@@ -104,9 +104,9 @@ defmodule GameTest do
 
   test "reveal guessed underscores not guessed letters" do
     game = Game.new_game("house")
-    game = Game.make_move(game, "e")
-    game = Game.make_move(game, "h")
-    game = Game.make_move(game, "a")
+    {game, _tally} = Game.make_move(game, "e")
+    {game, _tally} = Game.make_move(game, "h")
+    {game, _tally} = Game.make_move(game, "a")
     tally = Game.tally(game)
     assert Map.fetch!(tally, :game_state) == :bad_guess
     assert Map.fetch!(tally, :turns_left) == 6

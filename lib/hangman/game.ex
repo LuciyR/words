@@ -25,7 +25,8 @@ defmodule Hangman.Game do
   def tally(game) do
     %{game_state: game.game_state,
       turns_left: game.turns_left,
-      letters:    game.letters |> reveal_guessed(game.used)}
+      letters:    game.letters |> reveal_guessed(game.used),
+      used:       MapSet.to_list(game.used)}
   end
 
   defp accept_move(game, _guess, _already_guessed = true) do

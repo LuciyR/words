@@ -110,6 +110,7 @@ defmodule GameTest do
     tally = Game.tally(game)
     assert Map.fetch!(tally, :game_state) == :bad_guess
     assert Map.fetch!(tally, :turns_left) == 6
-    assert Map.fetch!(tally, :letters) == ["h", "_", "_", "_", "e"]
+    assert Map.fetch!(tally, :letters)    == ["h", "_", "_", "_", "e"]
+    assert Map.fetch!(tally, :used)       == ["a", "e", "h"]
   end
 end
